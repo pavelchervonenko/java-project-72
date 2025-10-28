@@ -1,18 +1,27 @@
 plugins {
     id("java")
+    id("application")
     id("checkstyle")
     id("jacoco")
     id("org.sonarqube") version "7.0.1.6134"
+    id("com.github.johnrengelman.shadow") version "8.1.1"
+
 }
 
 group = "hexlet.code"
 version = "1.0-SNAPSHOT"
+
+application {
+    mainClass = "hexlet.code.App"
+}
 
 repositories {
     mavenCentral()
 }
 
 dependencies {
+    implementation("org.slf4j:slf4j-simple:2.0.17")
+    implementation("io.javalin:javalin:6.7.0")
     implementation("com.fasterxml.jackson.core:jackson-databind:2.18.3")
     implementation("com.fasterxml.jackson.dataformat:jackson-dataformat-yaml:2.14.2")
     testImplementation(platform("org.junit:junit-bom:5.10.0"))
