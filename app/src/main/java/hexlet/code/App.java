@@ -13,6 +13,11 @@ import java.io.BufferedReader;
 import java.io.InputStreamReader;
 import java.io.IOException;
 
+import gg.jte.ContentType;
+import gg.jte.TemplateEngine;
+import io.javalin.rendering.template.JavalinJte;
+import gg.jte.resolve.ResourceCodeResolver;
+
 import java.util.stream.Collectors;
 
 //import lombok.extern.slf4j.Slf4j;
@@ -34,10 +39,11 @@ public final class App {
     public static Javalin getApp() {
         Javalin app = Javalin.create(config -> {
             config.bundledPlugins.enableDevLogging();
+            config.fileRenderer(new JavalinJte(createTemplateEngine()));
         });
 
         app.get("/", ctx -> {
-            ctx.result("Hello World");
+            ctx.result("index.jte");
         });
 
         return app;
@@ -77,7 +83,6 @@ public final class App {
         }
     }
 
-
     private static void runMigrations(DataSource ds) {
         String sql = readResourse("schema.sql");
 
@@ -87,5 +92,12 @@ public final class App {
         } catch (Exception e) {
             throw new RuntimeException("Schema init failed", e);
         }
+    }
+
+    private static TemplateEngine createTemplateEngine() {
+        ClassLoader classLoader = App.class.getClassLoader();
+        ResourceCodeResolver codeResolver = new ResourceCodeResolver("templates", classLoader);
+        TemplateEngine templateEngine = TemplateEngine.create(codeResolver, ContentType.Html);
+        return templateEngine;
     }
 }
