@@ -43,7 +43,7 @@ public final class App {
         });
 
         app.get("/", ctx -> {
-            ctx.result("index.jte");
+            ctx.render("index.jte");
         });
 
         return app;
