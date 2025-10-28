@@ -14,7 +14,6 @@ public final class App {
 
     public static void main(String[] args) {
         var app = getApp();
-
         app.start(getPort());
     }
 
@@ -23,8 +22,9 @@ public final class App {
             config.bundledPlugins.enableDevLogging();
         });
 
-       app.get("/", ctx ->
-               ctx.result("Hello World"));
+       app.get("/", ctx -> {
+           ctx.result("Hello World")
+       });
 
         return app;
     }
