@@ -20,10 +20,20 @@ repositories {
 }
 
 dependencies {
+    compileOnly("org.projectlombok:lombok:1.18.34")
+    annotationProcessor("org.projectlombok:lombok:1.18.34")
+
+    implementation("com.h2database:h2:2.4.240")
+
+    implementation("com.zaxxer:HikariCP:7.0.2")
+
     implementation("org.slf4j:slf4j-simple:2.0.17")
+
     implementation("io.javalin:javalin:6.7.0")
+
     implementation("com.fasterxml.jackson.core:jackson-databind:2.18.3")
     implementation("com.fasterxml.jackson.dataformat:jackson-dataformat-yaml:2.14.2")
+
     testImplementation(platform("org.junit:junit-bom:5.10.0"))
     testImplementation("org.junit.jupiter:junit-jupiter")
 }
