@@ -28,4 +28,4 @@ public final class App {
 
         return app;
     }
-}
+
