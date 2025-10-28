@@ -2,9 +2,9 @@ package hexlet.code;
 
 import io.javalin.Javalin;
 
-import lombok.extern.slf4j.Slf4j;
+//import lombok.extern.slf4j.Slf4j;
 
-@Slf4j
+//@Slf4j
 public final class App {
 
     private static int getPort() {
