@@ -23,7 +23,7 @@ public final class App {
         });
 
        app.get("/", ctx -> {
-           ctx.result("Hello World")
+           ctx.result("Hello World");
        });
 
         return app;
