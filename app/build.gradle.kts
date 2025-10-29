@@ -23,6 +23,8 @@ dependencies {
     compileOnly("org.projectlombok:lombok:1.18.34")
     annotationProcessor("org.projectlombok:lombok:1.18.34")
 
+    implementation("org.postgresql:postgresql:42.7.8")
+
     implementation("com.h2database:h2:2.4.240")
 
     implementation("com.zaxxer:HikariCP:7.0.2")
