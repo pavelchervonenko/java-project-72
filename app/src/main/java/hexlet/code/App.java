@@ -1,6 +1,14 @@
 package hexlet.code;
 
+import hexlet.code.controller.UrlsController;
+
+import hexlet.code.dto.IndexPage;
+
+import hexlet.code.util.NamedRoutes;
+
 import io.javalin.Javalin;
+import io.javalin.rendering.template.JavalinJte;
+import static io.javalin.rendering.template.TemplateUtil.model;
 
 import javax.sql.DataSource;
 
@@ -15,7 +23,6 @@ import java.io.IOException;
 
 import gg.jte.ContentType;
 import gg.jte.TemplateEngine;
-import io.javalin.rendering.template.JavalinJte;
 import gg.jte.resolve.ResourceCodeResolver;
 
 import java.util.stream.Collectors;
@@ -42,9 +49,15 @@ public final class App {
             config.fileRenderer(new JavalinJte(createTemplateEngine()));
         });
 
-        app.get("/", ctx -> {
-            ctx.render("index.jte");
+        app.get(NamedRoutes.rootPath(), ctx -> {
+            var page = new IndexPage();
+            page.setFlash(ctx.consumeSessionAttribute("flash"));
+            ctx.render("index.jte", model("page", page));
         });
+
+        app.get(NamedRoutes.urlsPath(), UrlsController::index);
+        app.get(NamedRoutes.urlPath(), UrlsController::show);
+        app.post(NamedRoutes.urlsPath(), UrlsController::create);
 
         return app;
     }
