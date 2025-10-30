@@ -1,5 +1,4 @@
 @import hexlet.code.dto.urls.UrlPage
-@import hexlet.code.NamedRoutes
 @param UrlPage page
 
 <html>
@@ -23,7 +22,7 @@
             </tr>
             <tr>
                 <th>Дата создания</th>
-                <td>${page.getUrl().getCreatedAt()}</td>
+                <td>${page.getUrl().getCreatedAt().toString()}</td>
             </tr>
         </table>
 
