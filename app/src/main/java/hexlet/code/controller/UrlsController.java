@@ -74,6 +74,7 @@ public class UrlsController {
         } catch (Exception e) {
             ctx.sessionAttribute("flash", "Некорректный URL");
             ctx.redirect(NamedRoutes.rootPath());
+            return;
         }
 
         try {
@@ -82,6 +83,7 @@ public class UrlsController {
             if (existing.isPresent()) {
                 ctx.sessionAttribute("flash", "Данный URL уже существует");
                 ctx.redirect(NamedRoutes.rootPath());
+                return;
             }
 
             var url = new Url(normalized);
@@ -89,10 +91,12 @@ public class UrlsController {
 
             ctx.sessionAttribute("flash", "URL успешно добавлен");
             ctx.redirect(NamedRoutes.urlsPath());
+            return;
 
         } catch (Exception e) {
             ctx.sessionAttribute("flash", "Ошибка базы данных");
             ctx.redirect(NamedRoutes.rootPath());
+            return;
         }
     }
 }
