@@ -39,6 +39,10 @@ dependencies {
 
     testImplementation(platform("org.junit:junit-bom:5.10.0"))
     testImplementation("org.junit.jupiter:junit-jupiter")
+    testImplementation("io.javalin:javalin-testtools:6.7.0")
+    testImplementation("org.assertj:assertj-core:3.26.0")
+    testImplementation("com.h2database:h2:2.3.232")
+    testImplementation("com.zaxxer:HikariCP:5.1.0")
 }
 
 checkstyle {
