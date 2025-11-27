@@ -1,10 +1,13 @@
 package hexlet.code.controller;
 
+import hexlet.code.dto.urls.UrlChecksPage;
 import hexlet.code.dto.urls.UrlPage;
 import hexlet.code.dto.urls.UrlsPage;
 
 import hexlet.code.model.Url;
 
+import hexlet.code.model.UrlCheck;
+import hexlet.code.repository.UrlCheckRepository;
 import hexlet.code.repository.UrlRepository;
 
 import hexlet.code.util.NamedRoutes;
@@ -14,23 +17,46 @@ import static io.javalin.rendering.template.TemplateUtil.model;
 import io.javalin.http.Context;
 import io.javalin.http.NotFoundResponse;
 
+import kong.unirest.core.Unirest;
+
+import org.jsoup.Jsoup;
+import org.jsoup.nodes.Document;
+import org.jsoup.nodes.Element;
+
 import java.net.URI;
 import java.net.URL;
+
+import java.util.HashMap;
 
 public class UrlsController {
     public static void index(Context ctx) throws Exception {
         var urls = UrlRepository.getEntities();
-        var page = new UrlsPage(urls);
+
+        var lastChecks = new HashMap<Long, UrlCheck>();
+        for (var url : urls) {
+            var opt = UrlCheckRepository.findLastByUrlId(url.getId());
+            if (opt.isPresent()) {
+                lastChecks.put(url.getId(), opt.get());
+            }
+        }
+
+        var page = new UrlsPage(urls, lastChecks);
         page.setFlash(ctx.consumeSessionAttribute("flash"));
+
         ctx.render("urls/index.jte", model("page", page));
     }
 
     public static void show(Context ctx) throws Exception {
         var id = ctx.pathParamAsClass("id", Long.class).get();
+
         var url = UrlRepository.findById(id)
                 .orElseThrow(() -> new NotFoundResponse("URL with id = " + id + " not found"));
         var page = new UrlPage(url);
-        ctx.render("urls/show.jte", model("page", page));
+
+        var urlChecks = UrlCheckRepository.findByUrlId(id);
+        var pageChecks = new UrlChecksPage(urlChecks);
+
+        ctx.render("urls/show.jte", model("page", page, "pageChecks", pageChecks));
     }
 
     public static void create(Context ctx) {
@@ -98,5 +124,34 @@ public class UrlsController {
             ctx.redirect(NamedRoutes.rootPath());
             return;
         }
+    }
+
+    public static void check(Context ctx) throws Exception {
+        var id = ctx.pathParamAsClass("id", Long.class).get();
+        var url = UrlRepository.findById(id)
+                .orElseThrow(() -> new NotFoundResponse("URL with id = " + id + " not found"));
+
+        var resp = Unirest.get(url.getName()).asString();
+        int status = resp.getStatus();
+        String body = resp.getBody();
+
+        Document doc = Jsoup.parse(body);
+        String title = doc.title();
+        Element h1Element = doc.selectFirst("h1");
+        String h1 = null;
+        if (h1Element != null) {
+            h1 = h1Element.text();
+        }
+        Element descriptionElement = doc.selectFirst("meta[name=description]");
+        String description = null;
+        if (descriptionElement != null) {
+            description = descriptionElement.attr("content");
+        }
+
+        var check = new UrlCheck(url.getId(), status, title, h1, description);
+        UrlCheckRepository.save(check);
+
+        ctx.redirect(NamedRoutes.urlPath(id));
+        return;
     }
 }
