@@ -20,8 +20,16 @@ repositories {
 }
 
 dependencies {
+    testImplementation("com.squareup.okhttp3:mockwebserver:4.12.0")
+
     compileOnly("org.projectlombok:lombok:1.18.34")
     annotationProcessor("org.projectlombok:lombok:1.18.34")
+
+    implementation(platform("com.konghq:unirest-java-bom:4.5.1"))
+    implementation("com.konghq:unirest-java-core")
+    implementation("com.konghq:unirest-modules-gson")
+
+    implementation("org.jsoup:jsoup:1.17.2")
 
     implementation("org.postgresql:postgresql:42.7.8")
     implementation("com.h2database:h2:2.4.240")
