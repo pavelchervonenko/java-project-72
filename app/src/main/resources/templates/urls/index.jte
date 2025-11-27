@@ -1,6 +1,8 @@
 @import hexlet.code.dto.urls.UrlsPage
-@import hexlet.code.util.NamedRoutes
 @import hexlet.code.model.Url
+@import static hexlet.code.util.DateUtils.format
+@import hexlet.code.util.NamedRoutes
+
 @param UrlsPage page
 
 <!DOCTYPE html>
@@ -22,19 +24,43 @@
           <table class="table table-striped align-middle">
             <thead>
               <tr>
-                <th scope="col">ID</th>
-                <th scope="col">Имя</th>
-                <th scope="col">Последняя проверка</th>
-                <th scope="col">Код ответа</th>
+                <th>ID</th>
+                <th>Имя</th>
+                <th>Последняя проверка</th>
+                <th>Код ответа</th>
               </tr>
             </thead>
             <tbody>
-              @for (Url u : page.getUrls())
+              @for (Url url : page.getUrls())
                 <tr>
-                  <td>${u.getId()}</td>
-                  <td><a href="/urls/${u.getId()}">${u.getName()}</a></td>
-                  <td>Надо сделать</td>
-                  <td>Надо сделать</td>
+                  <td>${url.getId()}</td>
+                  <td>
+                    <a href="${NamedRoutes.urlPath(url.getId())}">
+                      ${url.getName()}
+                    </a>
+                  </td>
+                  <td>
+                    @if (
+                      page.getLastChecks() != null &&
+                      page.getLastChecks().get(url.getId()) != null &&
+                      page.getLastChecks().get(url.getId()).getCreatedAt() != null
+                    )
+                      ${format(page.getLastChecks().get(url.getId()).getCreatedAt())}
+                    @else
+                      &mdash;
+                    @endif
+                  </td>
+                  <td>
+                    @if (
+                      page.getLastChecks() != null &&
+                      page.getLastChecks().get(url.getId()) != null &&
+                      page.getLastChecks().get(url.getId()).getStatusCode() != null
+                    )
+                      ${page.getLastChecks().get(url.getId()).getStatusCode()}
+                    @else
+                      &mdash;
+                    @endif
+                  </td>
                 </tr>
               @endfor
             </tbody>
