@@ -1,5 +1,10 @@
 @import hexlet.code.dto.urls.UrlPage
+@import hexlet.code.dto.urls.UrlChecksPage
+@import hexlet.code.model.UrlCheck
+@import static hexlet.code.util.DateUtils.format
+
 @param UrlPage page
+@param UrlChecksPage pageChecks
 
 <html>
     <head>
@@ -22,11 +27,15 @@
             </tr>
             <tr>
                 <th>Дата создания</th>
-                <td>${page.getUrl().getCreatedAt().toString()}</td>
+                <td>${format(page.getUrl().getCreatedAt())}</td>
             </tr>
         </table>
 
         <h2>Проверки</h2>
+
+        <form action="/urls/${page.getUrl().getId()}/checks" method="post" style="margin: 12px 0;">
+            <button type="submit">Запустить проверку</button>
+        </form>
 
         <table border="1" cellpadding="6" cellspacing="0">
             <tr>
@@ -37,7 +46,30 @@
                 <th>description</th>
                 <th>Дата проверки</th>
             </tr>
-        </table>
 
+            @for (UrlCheck check : pageChecks.getUrlChecks())
+                <tr>
+                    <td>
+                        ${check.getId()}
+                    </td>
+                    <td>
+                        ${check.getStatusCode()}
+                    </td>
+                    <td>
+                        ${check.getTitle()}
+                    </td>
+                    <td>
+                        ${check.getH1()}
+                    </td>
+                    <td>
+                        ${check.getDescription()}
+                    </td>
+                    <td>
+                        ${format(check.getCreatedAt())}
+                    </td>
+                </tr>
+            @endfor
+
+        </table>
     </body>
 </html>
