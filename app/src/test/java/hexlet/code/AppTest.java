@@ -203,8 +203,67 @@ public class AppTest {
 
         var recorded = mockWebServer.takeRequest();
         assertThat(recorded.getMethod()).isEqualTo("GET");
+    }
 
+    @Test
+    public void testUrlCheckHandlerWithoutTags() throws Exception {
+        var mockHtml = """
+            <!DOCTYPE html>
+            <html>
+              <head>
+              </head>
+              <body>
+                <p>No title and no h1 here</p>
+              </body>
+            </html>
+            """;
 
+        mockWebServer.enqueue(
+                new MockResponse()
+                        .setResponseCode(200)
+                        .setBody(mockHtml)
+        );
 
+        JavalinTest.test(app, (server, client) -> {
+            var formBody = "url=" + URLEncoder.encode(mockBaseUrl, StandardCharsets.UTF_8);
+            client.post("/urls", formBody);
+
+            var saved = UrlRepository.findByName(mockBaseUrl).orElseThrow();
+            var urlId = saved.getId();
+
+            client.post("/urls/" + urlId + "/checks");
+
+            var showResp = client.get("/urls/" + urlId);
+            assertThat(showResp.code()).isEqualTo(200);
+
+            var body = showResp.body().string();
+
+            assertThat(body).contains("200");
+
+        });
+
+        var recorded = mockWebServer.takeRequest();
+        assertThat(recorded.getMethod()).isEqualTo("GET");
+    }
+
+    @Test
+    public void testUrlsCreateInvalidUrl() {
+        JavalinTest.test(app, (server, client) -> {
+            var invalidUrl = "not-a-url";
+
+            var body = "url=" + URLEncoder.encode(invalidUrl, StandardCharsets.UTF_8);
+            var resp = client.post("/urls", body);
+
+            assertThat(resp.code()).isEqualTo(200);
+
+            var html = resp.body().string();
+
+            assertThat(html).contains("Анализатор страниц");
+            assertThat(html).contains("Ссылка");
+
+            assertThat(html).doesNotContain(invalidUrl);
+
+            assertThat(UrlRepository.findByName(invalidUrl)).isEmpty();
+        });
     }
 }
