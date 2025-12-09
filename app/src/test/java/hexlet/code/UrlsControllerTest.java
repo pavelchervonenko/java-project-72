@@ -266,4 +266,27 @@ public class UrlsControllerTest {
             assertThat(UrlRepository.findByName(invalidUrl)).isEmpty();
         });
     }
+
+    @Test
+    public void testShowNonExistingUrl() {
+        JavalinTest.test(app, (server, client) -> {
+            var resp = client.get("/urls/9999");
+
+            assertThat(resp.code()).isEqualTo(404);
+
+            var html = resp.body().string();
+
+            assertThat(html).contains("URL with id = 9999 not found");
+        });
+    }
+
+    @Test
+    public void testCheckNonExistingUrl() {
+        JavalinTest.test(app, (server, client) -> {
+            var resp = client.post("/urls/9999/checks");
+
+            assertThat(resp.code()).isEqualTo(404);
+        });
+    }
+
 }
