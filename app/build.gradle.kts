@@ -36,6 +36,7 @@ dependencies {
     implementation("com.zaxxer:HikariCP:7.0.2")
 
     implementation("org.slf4j:slf4j-simple:2.0.17")
+    runtimeOnly("org.slf4j:slf4j-simple:2.0.17")
 
     implementation("gg.jte:jte:3.2.0")
 
