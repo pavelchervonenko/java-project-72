@@ -1,12 +1,11 @@
 plugins {
-    id("java")
     id("application")
     id("checkstyle")
     id("jacoco")
     id("org.sonarqube") version "7.0.1.6134"
     id("com.github.johnrengelman.shadow") version "8.1.1"
-
 }
+
 
 group = "hexlet.code"
 version = "1.0-SNAPSHOT"
