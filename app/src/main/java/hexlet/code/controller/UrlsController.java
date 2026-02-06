@@ -34,10 +34,8 @@ public class UrlsController {
 
         var lastChecks = new HashMap<Long, UrlCheck>();
         for (var url : urls) {
-            var opt = UrlCheckRepository.findLastByUrlId(url.getId());
-            if (opt.isPresent()) {
-                lastChecks.put(url.getId(), opt.get());
-            }
+            UrlCheckRepository.findLastByUrlId(url.getId())
+                    .ifPresent(check -> lastChecks.put(url.getId(), check));
         }
 
         var page = new UrlsPage(urls, lastChecks);
