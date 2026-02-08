@@ -6,6 +6,8 @@ import com.zaxxer.hikari.HikariConfig;
 import com.zaxxer.hikari.HikariDataSource;
 
 import hexlet.code.model.Url;
+
+import hexlet.code.repository.UrlCheckRepository;
 import hexlet.code.repository.UrlRepository;
 import hexlet.code.repository.BaseRepository;
 
@@ -20,18 +22,17 @@ import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-import java.io.BufferedReader;
 import java.io.IOException;
-import java.io.InputStreamReader;
 
 import java.net.URLEncoder;
+
 import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Paths;
+
 import java.sql.Connection;
 import java.sql.Statement;
-
 import javax.sql.DataSource;
-
-import java.util.stream.Collectors;
 
 
 public class UrlsControllerTest {
@@ -41,17 +42,12 @@ public class UrlsControllerTest {
     private Javalin app;
 
     private static String loadSchemaSql() throws Exception {
-        var url = App.class.getClassLoader().getResourceAsStream("schema.sql");
+        var url = App.class.getClassLoader().getResource("schema.sql");
         if (url == null) {
-            throw new IllegalStateException("Resource not found: " + "schema.sql");
+            throw new IllegalStateException("Resource not found: schema.sql");
         }
 
-        try (var sql = new BufferedReader(new InputStreamReader(url))) {
-            return sql.lines().collect(Collectors.joining("\n"));
-        } catch (IOException e) {
-            throw new IllegalStateException("Failed to read resource: schema.sql", e);
-
-        }
+        return Files.readString(Paths.get(url.toURI()));
     }
 
     @BeforeAll
@@ -199,6 +195,15 @@ public class UrlsControllerTest {
             assertThat(body).contains("Mock page");
             assertThat(body).contains("Hello from mock");
             assertThat(body).contains("200");
+
+            var checks = UrlCheckRepository.findByUrlId(urlId);
+            assertThat(checks).isNotEmpty();
+
+            var lastCheck = checks.get(0);
+            assertThat(lastCheck.getStatusCode()).isEqualTo(200);
+            assertThat(lastCheck.getTitle()).isEqualTo("Mock page");
+            assertThat(lastCheck.getH1()).isEqualTo("Hello from mock");
+            assertThat(lastCheck.getDescription()).isNull();
         });
 
         var recorded = mockWebServer.takeRequest();
