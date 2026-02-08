@@ -51,7 +51,7 @@ public class UrlCheckRepository extends BaseRepository {
         String sql = "SELECT * "
                      + "FROM url_checks "
                      + "WHERE url_id = ? "
-                     + "ORDER BY created_at DESC, id DESC";
+                     + "ORDER BY created_at DESC, id DESC ";
 
         var result = new ArrayList<UrlCheck>();
 
