@@ -26,17 +26,12 @@ import org.jsoup.nodes.Element;
 import java.net.URI;
 import java.net.URL;
 
-import java.util.HashMap;
 
 public class UrlsController {
     public static void index(Context ctx) throws Exception {
         var urls = UrlRepository.getEntities();
 
-        var lastChecks = new HashMap<Long, UrlCheck>();
-        for (var url : urls) {
-            UrlCheckRepository.findLastByUrlId(url.getId())
-                    .ifPresent(check -> lastChecks.put(url.getId(), check));
-        }
+        var lastChecks = UrlCheckRepository.findLatestChecks();
 
         var page = new UrlsPage(urls, lastChecks);
         page.setFlash(ctx.consumeSessionAttribute("flash"));
@@ -57,7 +52,7 @@ public class UrlsController {
         ctx.render("urls/show.jte", model("page", page, "pageChecks", pageChecks));
     }
 
-    public static void create(Context ctx) {
+    public static void create(Context ctx) throws Exception {
         var param = ctx.formParam("url");
 
         if (param == null || param.isBlank()) {
@@ -66,34 +61,12 @@ public class UrlsController {
             return;
         }
 
-        String normalized = "";
+        URI uri;
+        URL parsed;
+
         try {
-            URI uri = new URI(param.trim());
-            URL parsed = uri.toURL();
-
-            String protocol = parsed.getProtocol();
-            String host = parsed.getHost();
-            int port = parsed.getPort();
-
-            if (protocol == null || protocol.isBlank()) {
-                ctx.sessionAttribute("flash", "Некорректный URL");
-                ctx.redirect(NamedRoutes.rootPath());
-                return;
-            }
-            if (host == null || host.isBlank()) {
-                ctx.sessionAttribute("flash", "Некорректный URL");
-                ctx.redirect(NamedRoutes.rootPath());
-                return;
-            }
-
-            StringBuilder sb = new StringBuilder();
-            sb.append(protocol).append("://").append(host);
-
-            if (port != -1) {
-                sb.append(":").append(port);
-            }
-
-            normalized = sb.toString();
+            uri = new URI(param.trim());
+            parsed = uri.toURL();
 
         } catch (Exception e) {
             ctx.sessionAttribute("flash", "Некорректный URL");
@@ -101,27 +74,40 @@ public class UrlsController {
             return;
         }
 
-        try {
-            var existing = UrlRepository.findByName(normalized);
+        String protocol = parsed.getProtocol();
+        String host = parsed.getHost();
+        int port = parsed.getPort();
 
-            if (existing.isPresent()) {
-                ctx.sessionAttribute("flash", "Данный URL уже существует");
-                ctx.redirect(NamedRoutes.rootPath());
-                return;
-            }
-
-            var url = new Url(normalized);
-            UrlRepository.save(url);
-
-            ctx.sessionAttribute("flash", "URL успешно добавлен");
-            ctx.redirect(NamedRoutes.urlsPath());
-            return;
-
-        } catch (Exception e) {
-            ctx.sessionAttribute("flash", "Ошибка базы данных");
+        if (protocol == null || protocol.isBlank()) {
+            ctx.sessionAttribute("flash", "Некорректный URL");
             ctx.redirect(NamedRoutes.rootPath());
             return;
         }
+        if (host == null || host.isBlank()) {
+            ctx.sessionAttribute("flash", "Некорректный URL");
+            ctx.redirect(NamedRoutes.rootPath());
+            return;
+        }
+
+        StringBuilder sb = new StringBuilder();
+        sb.append(protocol).append("://").append(host);
+
+        if (port != -1) {
+            sb.append(":").append(port);
+        }
+
+        String normalized = sb.toString();
+
+        UrlRepository.findByName(normalized).ifPresent(existing -> {
+            ctx.sessionAttribute("flash", "Данный URL уже существует");
+            ctx.redirect(NamedRoutes.rootPath());
+        });
+
+        var url = new Url(normalized);
+        UrlRepository.save(url);
+
+        ctx.sessionAttribute("flash", "URL успешно добавлен");
+        ctx.redirect(NamedRoutes.urlsPath());
     }
 
     public static void check(Context ctx) throws Exception {
@@ -129,27 +115,33 @@ public class UrlsController {
         var url = UrlRepository.findById(id)
                 .orElseThrow(() -> new NotFoundResponse("URL with id = " + id + " not found"));
 
-        var resp = Unirest.get(url.getName()).asString();
-        int status = resp.getStatus();
-        String body = resp.getBody();
+        try {
+            var resp = Unirest.get(url.getName()).asString();
+            int status = resp.getStatus();
+            String body = resp.getBody();
 
-        Document doc = Jsoup.parse(body);
-        String title = doc.title();
-        Element h1Element = doc.selectFirst("h1");
-        String h1 = null;
-        if (h1Element != null) {
-            h1 = h1Element.text();
+            Document doc = Jsoup.parse(body);
+            String title = doc.title();
+
+            Element h1Element = doc.selectFirst("h1");
+            String h1 = null;
+            if (h1Element != null) {
+                h1 = h1Element.text();
+            }
+
+            Element descriptionElement = doc.selectFirst("meta[name=description]");
+            String description = null;
+            if (descriptionElement != null) {
+                description = descriptionElement.attr("content");
+            }
+
+            var check = new UrlCheck(url.getId(), status, title, h1, description);
+            UrlCheckRepository.save(check);
+
+            ctx.redirect(NamedRoutes.urlPath(id));
+        } catch (Exception e) {
+            ctx.sessionAttribute("flash", "Сервис недоступен");
+            ctx.redirect(NamedRoutes.urlPath(id));
         }
-        Element descriptionElement = doc.selectFirst("meta[name=description]");
-        String description = null;
-        if (descriptionElement != null) {
-            description = descriptionElement.attr("content");
-        }
-
-        var check = new UrlCheck(url.getId(), status, title, h1, description);
-        UrlCheckRepository.save(check);
-
-        ctx.redirect(NamedRoutes.urlPath(id));
-        return;
     }
 }

@@ -8,9 +8,7 @@ import java.sql.Timestamp;
 
 import java.time.LocalDateTime;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 
 import hexlet.code.model.UrlCheck;
 
@@ -86,6 +84,32 @@ public class UrlCheckRepository extends BaseRepository {
                 }
             }
         }
+    }
+
+    public static Map<Long, UrlCheck> findLatestChecks() throws Exception {
+        String sql = "SELECT url_checks.* "
+                + "FROM url_checks "
+                + "JOIN ( "
+                + "  SELECT url_id, MAX(id) AS max_id "
+                + "  FROM url_checks "
+                + "  GROUP BY url_id "
+                + ") latest "
+                + "ON latest.max_id = url_checks.id ";
+
+        var result = new HashMap<Long, UrlCheck>();
+
+        try (var conn = dataSource.getConnection();
+             var stmt = conn.prepareStatement(sql)) {
+
+            try (var resultSet = stmt.executeQuery()) {
+                while (resultSet.next()) {
+                    var check = map(resultSet);
+                    result.put(check.getUrlId(), check);
+                }
+            }
+        }
+
+        return result;
     }
 
     private static UrlCheck map(ResultSet resultSet) throws Exception {
