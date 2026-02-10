@@ -56,13 +56,13 @@ public final class App {
         log.debug("Creating Javalin application");
 
         // TEST
-        if (BaseRepository.dataSource == null) {
-            log.info("DataSource is not initialized yet. Initializing in getApp().");
-            DataSource ds = buildDataSource();
-            BaseRepository.dataSource = ds;
-            runMigrations(ds);
-            log.info("DataSource initialized and migrations applied in getApp().");
-        }
+        //if (BaseRepository.dataSource == null) {
+        //    log.info("DataSource is not initialized yet. Initializing in getApp().");
+        //    DataSource ds = buildDataSource();
+        //    BaseRepository.dataSource = ds;
+        //    runMigrations(ds);
+        //    log.info("DataSource initialized and migrations applied in getApp().");
+        //}
 
         Javalin app = Javalin.create(config -> {
             config.bundledPlugins.enableDevLogging();
