@@ -155,7 +155,15 @@ public final class App {
 
         try (var connection = ds.getConnection();
              var statement = connection.createStatement()) {
-            statement.execute(sql);
+            //statement.execute(sql);
+
+            for (String part : sql.split(";")) {
+                String trimmed = part.trim();
+                if (!trimmed.isEmpty()) {
+                    statement.execute(trimmed);
+                }
+            }
+
             log.info("Schema.sql executed successfully");
         } catch (Exception e) {
             log.error("Schema init failed", e);

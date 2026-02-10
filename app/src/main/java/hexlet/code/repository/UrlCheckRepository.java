@@ -37,9 +37,6 @@ public class UrlCheckRepository extends BaseRepository {
             stmt.setString(4, check.getH1());
             stmt.setString(5, check.getDescription());
 
-            // TEST
-            stmt.setTimestamp(6, Timestamp.valueOf(check.getCreatedAt()));
-
             try (var generatedKeys = stmt.getGeneratedKeys()) {
 
                 if (generatedKeys.next()) {
