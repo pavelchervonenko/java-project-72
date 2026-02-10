@@ -28,6 +28,11 @@ import java.net.URL;
 
 
 public class UrlsController {
+    private UrlsController() {
+    }
+
+    private static final String INVALID_URL_MESSAGE = "Некорректный URL";
+
     public static void index(Context ctx) throws Exception {
         var urls = UrlRepository.getEntities();
 
@@ -56,7 +61,7 @@ public class UrlsController {
         var param = ctx.formParam("url");
 
         if (param == null || param.isBlank()) {
-            ctx.sessionAttribute("flash", "Некорректный URL");
+            ctx.sessionAttribute("flash", INVALID_URL_MESSAGE);
             ctx.redirect(NamedRoutes.rootPath());
             return;
         }
@@ -69,7 +74,7 @@ public class UrlsController {
             parsed = uri.toURL();
 
         } catch (Exception e) {
-            ctx.sessionAttribute("flash", "Некорректный URL");
+            ctx.sessionAttribute("flash", INVALID_URL_MESSAGE);
             ctx.redirect(NamedRoutes.rootPath());
             return;
         }
@@ -79,12 +84,12 @@ public class UrlsController {
         int port = parsed.getPort();
 
         if (protocol == null || protocol.isBlank()) {
-            ctx.sessionAttribute("flash", "Некорректный URL");
+            ctx.sessionAttribute("flash", INVALID_URL_MESSAGE);
             ctx.redirect(NamedRoutes.rootPath());
             return;
         }
         if (host == null || host.isBlank()) {
-            ctx.sessionAttribute("flash", "Некорректный URL");
+            ctx.sessionAttribute("flash", INVALID_URL_MESSAGE);
             ctx.redirect(NamedRoutes.rootPath());
             return;
         }
