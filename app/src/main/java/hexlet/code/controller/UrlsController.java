@@ -98,10 +98,16 @@ public class UrlsController {
 
         String normalized = sb.toString();
 
-        UrlRepository.findByName(normalized).ifPresent(existing -> {
-            ctx.sessionAttribute("flash", "Данный URL уже существует");
+        try {
+            var existing = UrlRepository.findByName(normalized);
+            if (existing.isPresent()) {
+                ctx.sessionAttribute("flash", "Данный URL уже существует");
+                ctx.redirect(NamedRoutes.rootPath());
+            }
+        } catch (Exception e) {
+            ctx.sessionAttribute("flash", "Ошибка базы данных");
             ctx.redirect(NamedRoutes.rootPath());
-        });
+        }
 
         var url = new Url(normalized);
         UrlRepository.save(url);
