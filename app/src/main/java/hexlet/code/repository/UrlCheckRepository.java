@@ -26,15 +26,19 @@ public class UrlCheckRepository extends BaseRepository {
 
 
             stmt.setLong(1, check.getUrlId());
+
             if (check.getStatusCode() == null) {
                 stmt.setNull(2, Types.INTEGER);
             } else {
                 stmt.setInt(2, check.getStatusCode());
             }
+
             stmt.setString(3, check.getTitle());
             stmt.setString(4, check.getH1());
             stmt.setString(5, check.getDescription());
-            stmt.executeUpdate();
+
+            // TEST
+            stmt.setTimestamp(6, Timestamp.valueOf(check.getCreatedAt()));
 
             try (var generatedKeys = stmt.getGeneratedKeys()) {
 
