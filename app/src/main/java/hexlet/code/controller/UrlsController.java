@@ -27,7 +27,7 @@ import java.net.URI;
 import java.net.URL;
 
 
-public class UrlsController {
+public final class UrlsController {
     private UrlsController() {
     }
 
