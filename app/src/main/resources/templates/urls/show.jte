@@ -23,6 +23,24 @@
           #f6f6f7;
       }
 
+      .desc-box {
+        width: 100%;
+        max-width: 420px;
+        max-height: 72px;
+        overflow: auto;
+
+        white-space: normal;
+        overflow-wrap: anywhere;
+        word-break: break-word;
+
+        line-height: 1.35;
+        padding: 8px 10px;
+        border: 1px solid rgba(0,0,0,.12);
+        border-radius: 12px;
+        background: rgba(0,0,0,.02);
+      }
+
+
       .frame {
         border-radius: 28px;
         border: 2px solid #101014;
@@ -173,7 +191,11 @@
                       <td>${check.getStatusCode()}</td>
                       <td>${check.getTitle()}</td>
                       <td>${check.getH1()}</td>
-                      <td>${check.getDescription()}</td>
+                      <td>
+                        <div class="desc-box">
+                          ${check.getDescription()}
+                        </div>
+                      </td>
                       <td>${format(check.getCreatedAt())}</td>
                     </tr>
                   @endfor
@@ -184,7 +206,6 @@
 
         </main>
 
-        <!-- FOOTER -->
         <footer class="footer">
           © Анализатор страниц
         </footer>
