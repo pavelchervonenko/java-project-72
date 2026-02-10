@@ -55,15 +55,6 @@ public final class App {
     public static Javalin getApp() {
         log.debug("Creating Javalin application");
 
-        // TEST
-        //if (BaseRepository.dataSource == null) {
-        //    log.info("DataSource is not initialized yet. Initializing in getApp().");
-        //    DataSource ds = buildDataSource();
-        //    BaseRepository.dataSource = ds;
-        //    runMigrations(ds);
-        //    log.info("DataSource initialized and migrations applied in getApp().");
-        //}
-
         Javalin app = Javalin.create(config -> {
             config.bundledPlugins.enableDevLogging();
             config.fileRenderer(new JavalinJte(createTemplateEngine()));

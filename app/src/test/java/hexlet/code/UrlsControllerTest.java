@@ -294,4 +294,16 @@ public class UrlsControllerTest {
         });
     }
 
+    @Test
+    public void testUrlCheckHandlerServiceUnavailable() throws Exception {
+        var url = new Url("http://127.0.0.1:1");
+        UrlRepository.save(url);
+
+        JavalinTest.test(app, (server, client) -> {
+            client.post("/urls/" + url.getId() + "/checks");
+
+            var checks = UrlCheckRepository.findByUrlId(url.getId());
+            assertThat(checks).isEmpty();
+        });
+    }
 }
