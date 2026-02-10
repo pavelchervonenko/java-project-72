@@ -103,10 +103,12 @@ public class UrlsController {
             if (existing.isPresent()) {
                 ctx.sessionAttribute("flash", "Данный URL уже существует");
                 ctx.redirect(NamedRoutes.rootPath());
+                return;
             }
         } catch (Exception e) {
             ctx.sessionAttribute("flash", "Ошибка базы данных");
             ctx.redirect(NamedRoutes.rootPath());
+            return;
         }
 
         var url = new Url(normalized);

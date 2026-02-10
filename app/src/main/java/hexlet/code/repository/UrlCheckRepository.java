@@ -37,6 +37,8 @@ public class UrlCheckRepository extends BaseRepository {
             stmt.setString(4, check.getH1());
             stmt.setString(5, check.getDescription());
 
+            stmt.executeUpdate();
+
             try (var generatedKeys = stmt.getGeneratedKeys()) {
 
                 if (generatedKeys.next()) {
