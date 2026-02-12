@@ -53,6 +53,13 @@ public final class App {
     }
 
     public static Javalin getApp() {
+        // TEST
+        if (BaseRepository.dataSource != null) {
+            DataSource ds = buildDataSource();
+            BaseRepository.dataSource = ds;
+            runMigrations(ds);
+        }
+
         log.debug("Creating Javalin application");
 
         Javalin app = Javalin.create(config -> {
