@@ -34,7 +34,7 @@ public final class App {
 
     private static final String DEV_H2_URL = "jdbc:h2:mem:project;DB_CLOSE_DELAY=-1;";
 
-    private static boolean InitDataBase = false;
+    private static boolean initDataBase = false;
 
 
     public static void main(String[] args) {
@@ -98,7 +98,7 @@ public final class App {
     }
 
     private static synchronized void init() {
-        if (InitDataBase) {
+        if (initDataBase) {
             return;
         }
 
@@ -106,7 +106,7 @@ public final class App {
         BaseRepository.dataSource = ds;
 
         runMigrations(ds);
-        InitDataBase = true;
+        initDataBase = true;
 
         log.info("DB initialized successfully");
     }
