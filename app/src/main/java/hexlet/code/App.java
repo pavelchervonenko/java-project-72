@@ -34,8 +34,7 @@ public final class App {
 
     private static final String DEV_H2_URL = "jdbc:h2:mem:project;DB_CLOSE_DELAY=-1;";
 
-    private static boolean initDataBase = false;
-
+    private static boolean dbInit = false;
 
     public static void main(String[] args) {
         //log.info("Starting application initialization");
@@ -56,7 +55,7 @@ public final class App {
     }
 
     public static Javalin getApp() {
-        init();
+        initDb();
 
         log.debug("Creating Javalin application");
 
@@ -97,18 +96,18 @@ public final class App {
         return app;
     }
 
-    private static synchronized void init() {
-        if (initDataBase) {
+    private static synchronized void initDb() {
+        if (dbInit) {
             return;
         }
 
-        DataSource ds = buildDataSource();
-        BaseRepository.dataSource = ds;
+        if (BaseRepository.dataSource == null) {
+            DataSource ds = buildDataSource();
+            BaseRepository.dataSource = ds;
+        }
 
-        runMigrations(ds);
-        initDataBase = true;
-
-        log.info("DB initialized successfully");
+        runMigrations(BaseRepository.dataSource);
+        dbInit = true;
     }
 
     private static int getPort() {

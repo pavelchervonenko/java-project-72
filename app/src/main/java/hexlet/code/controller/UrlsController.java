@@ -94,24 +94,18 @@ public final class UrlsController {
 
         String normalized = sb.toString();
 
-        try {
-            var existing = UrlRepository.findByName(normalized);
-            if (existing.isPresent()) {
-                ctx.sessionAttribute("flash", "Данный URL уже существует");
-                ctx.redirect(NamedRoutes.urlsPath());
-                return;
-            }
-
-            var url = new Url(normalized);
-            UrlRepository.save(url);
-
-            ctx.sessionAttribute("flash", "URL успешно добавлен");
+        var existing = UrlRepository.findByName(normalized);
+        if (existing.isPresent()) {
+            ctx.sessionAttribute("flash", "Данный URL уже существует");
             ctx.redirect(NamedRoutes.urlsPath());
-
-        } catch (Exception e) {
-            ctx.sessionAttribute("flash", "Ошибка базы данных");
-            ctx.redirect(NamedRoutes.urlsPath());
+            return;
         }
+
+        var url = new Url(normalized);
+        UrlRepository.save(url);
+
+        ctx.sessionAttribute("flash", "URL успешно добавлен");
+        ctx.redirect(NamedRoutes.urlsPath());
     }
 
     public static void check(Context ctx) throws Exception {
