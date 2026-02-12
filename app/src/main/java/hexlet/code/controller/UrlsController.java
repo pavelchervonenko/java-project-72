@@ -23,7 +23,6 @@ import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 
-import java.net.URI;
 import java.net.URL;
 
 
@@ -66,13 +65,10 @@ public final class UrlsController {
             return;
         }
 
-        URI uri;
         URL parsed;
 
         try {
-            uri = new URI(param.trim());
-            parsed = uri.toURL();
-
+            parsed = new URL(param.trim());
         } catch (Exception e) {
             ctx.sessionAttribute("flash", INVALID_URL_MESSAGE);
             ctx.redirect(NamedRoutes.rootPath());
