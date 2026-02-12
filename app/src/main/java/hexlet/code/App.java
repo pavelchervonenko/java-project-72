@@ -54,11 +54,7 @@ public final class App {
 
     public static Javalin getApp() {
         // TEST
-        if (BaseRepository.dataSource != null) {
-            DataSource ds = buildDataSource();
-            BaseRepository.dataSource = ds;
-            runMigrations(ds);
-        }
+        initDbIfNeeded();
 
         log.debug("Creating Javalin application");
 
@@ -171,5 +167,14 @@ public final class App {
 
         log.info("JTE TemplateEngine created");
         return templateEngine;
+    }
+
+    private static synchronized void initDbIfNeeded() {
+        if (BaseRepository.dataSource != null) {
+            return;
+        }
+        DataSource ds = buildDataSource();
+        BaseRepository.dataSource = ds;
+        runMigrations(ds);
     }
 }
