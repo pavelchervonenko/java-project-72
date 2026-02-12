@@ -107,7 +107,7 @@ public final class UrlsController {
             var existing = UrlRepository.findByName(normalized);
             if (existing.isPresent()) {
                 ctx.sessionAttribute("flash", "Данный URL уже существует");
-                ctx.redirect(NamedRoutes.rootPath());
+                ctx.redirect(NamedRoutes.urlsPath());
                 return;
             }
         } catch (Exception e) {
