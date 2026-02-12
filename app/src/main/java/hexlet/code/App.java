@@ -53,9 +53,6 @@ public final class App {
     }
 
     public static Javalin getApp() {
-        // TEST
-        initDbIfNeeded();
-
         log.debug("Creating Javalin application");
 
         Javalin app = Javalin.create(config -> {
@@ -167,14 +164,5 @@ public final class App {
 
         log.info("JTE TemplateEngine created");
         return templateEngine;
-    }
-
-    private static synchronized void initDbIfNeeded() {
-        if (BaseRepository.dataSource != null) {
-            return;
-        }
-        DataSource ds = buildDataSource();
-        BaseRepository.dataSource = ds;
-        runMigrations(ds);
     }
 }
