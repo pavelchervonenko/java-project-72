@@ -13,4 +13,11 @@ CREATE TABLE IF NOT EXISTS url_checks (
     description TEXT,
     created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
     CONSTRAINT fk_checks_url FOREIGN KEY (url_id) REFERENCES urls(id) ON DELETE CASCADE
-)
+);
+
+ALTER TABLE url_checks
+    ALTER COLUMN created_at SET DEFAULT CURRENT_TIMESTAMP;
+
+UPDATE url_checks
+SET created_at = CURRENT_TIMESTAMP
+WHERE created_at IS NULL;
