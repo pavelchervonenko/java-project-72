@@ -34,15 +34,18 @@ public final class App {
 
     private static final String DEV_H2_URL = "jdbc:h2:mem:project;DB_CLOSE_DELAY=-1;";
 
+    private static boolean InitDataBase = false;
+
+
     public static void main(String[] args) {
-        log.info("Starting application initialization");
+        //log.info("Starting application initialization");
 
-        DataSource ds = buildDataSource();
-        BaseRepository.dataSource = ds;
+        //DataSource ds = buildDataSource();
+        //BaseRepository.dataSource = ds;
 
-        log.info("Starting application initialization");
-        runMigrations(ds);
-        log.info("DB migrations finished successfully");
+        //log.info("Starting application initialization");
+        //runMigrations(ds);
+        //log.info("DB migrations finished successfully");
 
         int port = getPort();
         log.info("Starting Javalin server on port {}", port);
@@ -53,6 +56,8 @@ public final class App {
     }
 
     public static Javalin getApp() {
+        init();
+
         log.debug("Creating Javalin application");
 
         Javalin app = Javalin.create(config -> {
@@ -92,6 +97,20 @@ public final class App {
         return app;
     }
 
+    private static synchronized void init() {
+        if (InitDataBase) {
+            return;
+        }
+
+        DataSource ds = buildDataSource();
+        BaseRepository.dataSource = ds;
+
+        runMigrations(ds);
+        InitDataBase = true;
+
+        log.info("DB initialized successfully");
+    }
+
     private static int getPort() {
         String port = System.getenv().getOrDefault("PORT", "7070");
         return Integer.valueOf(port);
@@ -114,8 +133,8 @@ public final class App {
 
         HikariConfig cfg = new HikariConfig();
         cfg.setJdbcUrl(jdbcUrl);
-        DataSource ds = new HikariDataSource(cfg);
 
+        DataSource ds = new HikariDataSource(cfg);
         log.info("HikariDataSource created");
         return ds;
     }
