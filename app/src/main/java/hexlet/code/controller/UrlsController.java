@@ -79,12 +79,7 @@ public final class UrlsController {
         String host = parsed.getHost();
         int port = parsed.getPort();
 
-        if (protocol == null || protocol.isBlank()) {
-            ctx.sessionAttribute("flash", INVALID_URL_MESSAGE);
-            ctx.redirect(NamedRoutes.rootPath());
-            return;
-        }
-        if (host == null || host.isBlank()) {
+        if (protocol == null || protocol.isBlank() || host == null || host.isBlank()) {
             ctx.sessionAttribute("flash", INVALID_URL_MESSAGE);
             ctx.redirect(NamedRoutes.rootPath());
             return;
@@ -106,17 +101,17 @@ public final class UrlsController {
                 ctx.redirect(NamedRoutes.urlsPath());
                 return;
             }
+
+            var url = new Url(normalized);
+            UrlRepository.save(url);
+
+            ctx.sessionAttribute("flash", "URL успешно добавлен");
+            ctx.redirect(NamedRoutes.urlsPath());
+
         } catch (Exception e) {
             ctx.sessionAttribute("flash", "Ошибка базы данных");
-            ctx.redirect(NamedRoutes.rootPath());
-            return;
+            ctx.redirect(NamedRoutes.urlsPath());
         }
-
-        var url = new Url(normalized);
-        UrlRepository.save(url);
-
-        ctx.sessionAttribute("flash", "URL успешно добавлен");
-        ctx.redirect(NamedRoutes.urlsPath());
     }
 
     public static void check(Context ctx) throws Exception {
