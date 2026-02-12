@@ -79,12 +79,6 @@ public final class UrlsController {
         String host = parsed.getHost();
         int port = parsed.getPort();
 
-        if (protocol == null || protocol.isBlank() || host == null || host.isBlank()) {
-            ctx.sessionAttribute("flash", INVALID_URL_MESSAGE);
-            ctx.redirect(NamedRoutes.rootPath());
-            return;
-        }
-
         StringBuilder sb = new StringBuilder();
         sb.append(protocol).append("://").append(host);
 
