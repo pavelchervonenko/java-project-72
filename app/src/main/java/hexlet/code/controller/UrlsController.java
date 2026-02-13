@@ -19,13 +19,14 @@ import io.javalin.http.NotFoundResponse;
 
 import kong.unirest.core.Unirest;
 
+import lombok.extern.slf4j.Slf4j;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 
 import java.net.URL;
 
-
+@Slf4j
 public final class UrlsController {
     private UrlsController() {
     }
@@ -132,6 +133,7 @@ public final class UrlsController {
 
             ctx.redirect(NamedRoutes.urlPath(id));
         } catch (Exception e) {
+            log.error("Check failed for urlId={}", id, e);
             ctx.sessionAttribute("flash", "Сервис недоступен");
             ctx.redirect(NamedRoutes.urlPath(id));
         }
