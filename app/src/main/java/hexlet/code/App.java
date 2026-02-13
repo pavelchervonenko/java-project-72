@@ -37,15 +37,6 @@ public final class App {
     private static boolean dbInit = false;
 
     public static void main(String[] args) {
-        //log.info("Starting application initialization");
-
-        //DataSource ds = buildDataSource();
-        //BaseRepository.dataSource = ds;
-
-        //log.info("Starting application initialization");
-        //runMigrations(ds);
-        //log.info("DB migrations finished successfully");
-
         int port = getPort();
         log.info("Starting Javalin server on port {}", port);
 
@@ -97,6 +88,7 @@ public final class App {
     }
 
     private static synchronized void initDb() {
+        log.info("Starting application initialization");
         if (dbInit) {
             return;
         }
@@ -108,6 +100,7 @@ public final class App {
 
         runMigrations(BaseRepository.dataSource);
         dbInit = true;
+        log.info("DB migrations finished successfully");
     }
 
     private static int getPort() {
