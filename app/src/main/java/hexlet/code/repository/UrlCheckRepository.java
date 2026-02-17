@@ -18,8 +18,8 @@ import hexlet.code.model.UrlCheck;
 
 public class UrlCheckRepository extends BaseRepository {
     public static void save(UrlCheck check) throws Exception {
-        String sql = "INSERT INTO url_checks (url_id, status_code, title, h1, description)"
-                     + "VALUES (?, ?, ?, ?, ?)";
+        String sql = "INSERT INTO url_checks (url_id, status_code, title, h1, description, created_at)"
+                     + "VALUES (?, ?, ?, ?, ?, ?)";
 
         try (var conn = dataSource.getConnection();
              var stmt = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
@@ -36,6 +36,12 @@ public class UrlCheckRepository extends BaseRepository {
             stmt.setString(3, check.getTitle());
             stmt.setString(4, check.getH1());
             stmt.setString(5, check.getDescription());
+
+            var now = LocalDateTime.now();
+            if (check.getCreatedAt() != null) {
+                now = check.getCreatedAt();
+            }
+            stmt.setTimestamp(6, Timestamp.valueOf(now));
 
             stmt.executeUpdate();
 
